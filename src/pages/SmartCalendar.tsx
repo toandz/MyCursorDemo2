@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import { Box, Paper, Typography, IconButton, Select, MenuItem } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { format, getDaysInMonth, startOfMonth, getDay, addMonths, subMonths } from 'date-fns';
+import DayView from '../components/planner/DayView';
 
 const Container = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -237,15 +238,28 @@ interface MonthViewProps {
 
 const MonthView: React.FC<MonthViewProps> = ({ date, onBack }) => {
   const [selectedWeek, setSelectedWeek] = useState<number>(0);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const days = generateMonthDays(date);
   const today = new Date();
   const monthStart = startOfMonth(date);
   const daysInMonth = getDaysInMonth(monthStart);
   const startingDayIndex = getDay(monthStart);
 
-  const handleDayClick = (weekIndex: number) => {
+  const handleDayClick = (weekIndex: number, dayNumber: number) => {
     setSelectedWeek(weekIndex);
+    if (dayNumber > 0 && dayNumber <= daysInMonth) {
+      setSelectedDate(new Date(date.getFullYear(), date.getMonth(), dayNumber));
+    }
   };
+
+  if (selectedDate) {
+    return (
+      <DayView 
+        date={selectedDate} 
+        onClose={() => setSelectedDate(null)} 
+      />
+    );
+  }
 
   // Calculate the days to display in the first row (Sunday to Wednesday)
   const firstRowDays = Array.from({ length: 4 }, (_, i) => {
@@ -297,7 +311,7 @@ const MonthView: React.FC<MonthViewProps> = ({ date, onBack }) => {
               isToday={day.isToday}
               isCurrentMonth={day.isCurrentMonth}
               isSelected={selectedWeek === day.weekIndex}
-              onClick={() => handleDayClick(day.weekIndex)}
+              onClick={() => handleDayClick(day.weekIndex, parseInt(day.day))}
             >
               {day.day}
             </DayCell>
