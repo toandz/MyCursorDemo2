@@ -79,11 +79,8 @@ const DayCell = styled(Box, {
   fontSize: '0.875rem',
   color: isCurrentMonth ? theme.palette.text.primary : theme.palette.text.disabled,
   position: 'relative',
-  cursor: 'pointer',
+  cursor: 'default',
   backgroundColor: isSelected ? theme.palette.action.selected : 'transparent',
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
   ...(isToday && {
     '&::after': {
       content: '""',
@@ -245,8 +242,12 @@ const MonthView: React.FC<MonthViewProps> = ({ date, onBack }) => {
   const daysInMonth = getDaysInMonth(monthStart);
   const startingDayIndex = getDay(monthStart);
 
-  const handleDayClick = (weekIndex: number, dayNumber: number) => {
+  const handleDayClick = (weekIndex: number) => {
     setSelectedWeek(weekIndex);
+  };
+
+  // Handle click on the day grid panel  
+  const handleDayGridClick = (dayNumber: number) => {
     if (dayNumber > 0 && dayNumber <= daysInMonth) {
       setSelectedDate(new Date(date.getFullYear(), date.getMonth(), dayNumber));
     }
@@ -311,7 +312,19 @@ const MonthView: React.FC<MonthViewProps> = ({ date, onBack }) => {
               isToday={day.isToday}
               isCurrentMonth={day.isCurrentMonth}
               isSelected={selectedWeek === day.weekIndex}
-              onClick={() => handleDayClick(day.weekIndex, parseInt(day.day))}
+              onClick={() => handleDayClick(day.weekIndex)}
+              sx={{ 
+                cursor: 'default',
+                '&:hover': {
+                  backgroundColor: 'transparent'
+                },
+                ...(selectedWeek === day.weekIndex && {
+                  backgroundColor: theme => theme.palette.action.selected,
+                  '&:hover': {
+                    backgroundColor: theme => theme.palette.action.selected
+                  }
+                })
+              }}
             >
               {day.day}
             </DayCell>
@@ -322,7 +335,16 @@ const MonthView: React.FC<MonthViewProps> = ({ date, onBack }) => {
       <DailyViewSection>
         {/* First row: Sunday to Wednesday */}
         {firstRowDays.map((day, index) => (
-          <DayCard key={index} elevation={0}>
+          <DayCard 
+            key={index} 
+            elevation={0}
+            onClick={() => day.isCurrentMonth && handleDayGridClick(day.dayNumber)}
+            sx={{ 
+              cursor: day.isCurrentMonth ? 'pointer' : 'default',
+              opacity: day.isCurrentMonth ? 1 : 0.3,
+              backgroundColor: day.isCurrentMonth ? 'background.paper' : 'action.disabledBackground'
+            }}
+          >
             <DayCardHeader>
               <DayName>{day.weekday}</DayName>
               {day.isCurrentMonth && (
@@ -341,7 +363,16 @@ const MonthView: React.FC<MonthViewProps> = ({ date, onBack }) => {
 
         {/* Second row: Thursday to Saturday */}
         {secondRowDays.map((day, index) => (
-          <DayCard key={index} elevation={0}>
+          <DayCard 
+            key={index} 
+            elevation={0}
+            onClick={() => day.isCurrentMonth && handleDayGridClick(day.dayNumber)}
+            sx={{ 
+              cursor: day.isCurrentMonth ? 'pointer' : 'default',
+              opacity: day.isCurrentMonth ? 1 : 0.3,
+              backgroundColor: day.isCurrentMonth ? 'background.paper' : 'action.disabledBackground'
+            }}
+          >
             <DayCardHeader>
               <DayName>{day.weekday}</DayName>
               {day.isCurrentMonth && (
@@ -432,6 +463,12 @@ const YearCalendar: React.FC = () => {
                     key={index}
                     isToday={day.isToday}
                     isCurrentMonth={day.isCurrentMonth}
+                    sx={{ 
+                      cursor: 'default',
+                      '&:hover': {
+                        backgroundColor: 'transparent'
+                      }
+                    }}
                   >
                     {day.day}
                   </DayCell>

@@ -9,9 +9,10 @@ import {
   ListItemText,
   IconButton,
   Paper,
-  Divider
+  Divider,
+  Button
 } from '@mui/material';
-import { ChevronRight, Add as AddIcon } from '@mui/icons-material';
+import { ChevronRight, Add as AddIcon, ArrowBack } from '@mui/icons-material';
 import { templates } from '../templates/PlannerTemplates';
 
 interface DayViewProps {
@@ -46,22 +47,24 @@ const DayView: React.FC<DayViewProps> = ({ date, onClose }) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          transition: theme => theme.transitions.create('margin', {
+          width: `calc(100% - ${isDrawerOpen ? DRAWER_WIDTH : 0}px)`,
+          transition: theme => theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
-          }),
-          marginRight: `${DRAWER_WIDTH}px`,
-          ...(isDrawerOpen && {
-            transition: theme => theme.transitions.create('margin', {
-              easing: theme.transitions.easing.easeOut,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-            marginRight: 0,
-          }),
+          })
         }}
       >
         {/* Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Button 
+            startIcon={<ArrowBack />}
+            onClick={onClose}
+            variant="outlined"
+            size="small"
+            sx={{ mr: 2 }}
+          >
+            Back to Month
+          </Button>
           <Typography variant="h4" component="h1">
             {date.toLocaleDateString('en-US', { 
               weekday: 'long',
@@ -120,7 +123,9 @@ const DayView: React.FC<DayViewProps> = ({ date, onClose }) => {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
             border: 'none',
-            bgcolor: 'grey.50'
+            bgcolor: 'grey.50',
+            position: 'fixed',
+            height: '100%'
           },
         }}
         variant="persistent"
